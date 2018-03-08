@@ -39,14 +39,12 @@ class v8js::extension(
 			ensure  => installed,
 			require => [
 				Apt::Pin["${php_package}-dev"],
-				# Class['chassis::php'],
 			],
 		}
 	}
 
 	package { 'php-pear':
 		ensure => installed,
-		# require => Class['chassis::php'],
 	}
 
 	exec { 'pecl channel-update pecl.php.net':

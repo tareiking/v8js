@@ -101,8 +101,8 @@ class v8js::extension(
 			"/etc/php/${version}/fpm/conf.d/99-v8js.ini",
 			"/etc/php/${version}/cli/conf.d/99-v8js.ini"
 		]:
-			ensure  => absent,
-			notify  => Service["${php_package}-fpm"],
+			ensure => absent,
+			notify => Service["${php_package}-fpm"],
 		}
 	}
 }

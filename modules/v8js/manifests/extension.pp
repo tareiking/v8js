@@ -2,13 +2,19 @@
 class v8js::extension(
 	$config
 ) {
+	if ( ! empty( $config[disabled_extensions] ) and 'chassis/v8js' in $config[disabled_extensions] ) {
+		$package = absent
+	} else {
+		$package = installed
+	}
+
 	$v8_version = '6.6'
 	apt::ppa { "ppa:pinepain/libv8-${v8_version}":
 		require => [ Package[ $::apt::ppa_package ] ],
 	}
 
 	package { [ "libv8-${v8_version}", "libv8-${v8_version}-dev" ]:
-		ensure  => installed,
+		ensure  => $package,
 		require => [ Apt::Ppa["ppa:pinepain/libv8-${v8_version}"] ],
 	}
 
@@ -37,7 +43,7 @@ class v8js::extension(
 			priority => 1001,
 		}
 		package { "${php_package}-dev":
-			ensure  => installed,
+			ensure  => $package,
 			require => [
 				Apt::Pin["${php_package}-dev"],
 			],
@@ -48,37 +54,55 @@ class v8js::extension(
 		ensure => installed,
 	}
 
-	exec { 'pecl channel-update pecl.php.net':
-		path    => '/usr/bin',
-		require => Package['php-pear'],
-	}
+	if ( installed == $package ) {
+		exec { 'pecl install v8js':
+			command   => "/bin/echo '/opt/libv8-${v8_version}
+				' | /usr/bin/pecl install v8js",
+			unless    => '/usr/bin/pecl info v8js',
+			logoutput => true,
+			require   => [
+				Package["libv8-${v8_version}"],
+				Package["libv8-${v8_version}-dev"],
+				Package['php-pear'],
+				Package["${php_package}-dev"],
+				Exec['pecl channel-update pecl.php.net'],
+			],
+		}
 
-	exec { 'pecl install v8js':
-		command   => "/bin/echo '/opt/libv8-${v8_version}' | /usr/bin/pecl install v8js",
-		unless    => '/usr/bin/pecl info v8js',
-		logoutput => true,
-		require   => [
-			Package["libv8-${v8_version}"],
-			Package["libv8-${v8_version}-dev"],
-			Package['php-pear'],
-			Package["${php_package}-dev"],
-			Exec['pecl channel-update pecl.php.net'],
-		],
-	}
+		exec { 'pecl channel-update pecl.php.net':
+			path    => '/usr/bin',
+			require => Package['php-pear'],
+		}
 
-	file { "/etc/php/${version}/mods-available/v8js.ini":
-		ensure  => file,
-		content => 'extension=v8js.so',
-		require => Exec['pecl install v8js'],
-	}
+		file { "/etc/php/${version}/mods-available/v8js.ini":
+			ensure  => file,
+			content => 'extension=v8js.so',
+			require => Exec['pecl install v8js'],
+		}
 
-	file { [
-		"/etc/php/${version}/fpm/conf.d/99-v8js.ini",
-		"/etc/php/${version}/cli/conf.d/99-v8js.ini"
-	]:
-		ensure  => link,
-		require => [ File["/etc/php/${version}/mods-available/v8js.ini"], [ Package["${php_package}-fpm"] ] ],
-		target  => "/etc/php/${version}/mods-available/v8js.ini",
-		notify  => Service["${php_package}-fpm"],
+		file { [
+			"/etc/php/${version}/fpm/conf.d/99-v8js.ini",
+			"/etc/php/${version}/cli/conf.d/99-v8js.ini"
+		]:
+			ensure  => link,
+			require => [ File["/etc/php/${version}/mods-available/v8js.ini"], [
+				Package["${php_package}-fpm"] ] ],
+			target  => "/etc/php/${version}/mods-available/v8js.ini",
+			notify  => Service["${php_package}-fpm"],
+		}
+	} else {
+		exec { 'pecl uninstall v8js':
+			path    => [ '/bin/', '/sbin/' , '/usr/bin/', '/usr/sbin/' ],
+			command => 'pecl uninstall v8js',
+			require => Package['php-pear'],
+		}
+		file { [
+			"/etc/php/${version}/mods-available/v8js.ini",
+			"/etc/php/${version}/fpm/conf.d/99-v8js.ini",
+			"/etc/php/${version}/cli/conf.d/99-v8js.ini"
+		]:
+			ensure => absent,
+			notify => Service["${php_package}-fpm"],
+		}
 	}
 }

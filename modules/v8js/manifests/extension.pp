@@ -54,15 +54,13 @@ class v8js::extension(
 
 	exec { 'pecl install v8js':
 		command => "/bin/echo '/opt/libv8-${v8_version}' | /usr/bin/pecl install v8js",
-		# environment => [
-		# 	'LDFLAGS="-lstdc++"'
-		# ],
 		unless  => '/usr/bin/pecl info v8js',
 		logoutput => true,
 		require => [
 			Package["libv8-${v8_version}"],
 			Package["libv8-${v8_version}-dev"],
 			Package['php-pear'],
+			Package["${php_package}-dev"],
 			Exec['pecl channel-update pecl.php.net'],
 		],
 	}

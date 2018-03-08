@@ -2,7 +2,7 @@
 class v8js::extension(
 	$config
 ) {
-	$v8_version = '5.2'
+	$v8_version = '6.6'
 	apt::ppa { "ppa:pinepain/libv8-${v8_version}":
 		require => [ Package[ $::apt::ppa_package ] ],
 	}

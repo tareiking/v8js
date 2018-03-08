@@ -26,7 +26,7 @@ class v8js::extension(
 		$php_package = 'php5'
 	}
 	else {
-		$php_package = "php${short_ver}"
+		$php_package = "php${version}"
 	}
 
 	if !defined(Package["${php_package}-dev"]) {
@@ -65,19 +65,19 @@ class v8js::extension(
 		],
 	}
 
-	file { "/etc/php/7.1/mods-available/v8js.ini":
+	file { "/etc/php/${version}/mods-available/v8js.ini":
 		ensure => file,
 		content => "extension=v8js.so",
 		require => Exec['pecl install v8js'],
 	}
 
 	file { [
-		"/etc/php/${php_package}/fpm/conf.d/99-v8js.ini",
-		"/etc/php/${php_package}/cli/conf.d/99-v8js.ini"
+		"/etc/php/${version}/fpm/conf.d/99-v8js.ini",
+		"/etc/php/${version}/cli/conf.d/99-v8js.ini"
 	]:
 		ensure => link,
-		require => File["/etc/php/${php_package}/mods-available/v8js.ini"],
-		target => "/etc/php/${php_package}/mods-available/v8js.ini",
+		require => File["/etc/php/${version}/mods-available/v8js.ini"],
+		target => "/etc/php/${version}/mods-available/v8js.ini",
 		notify => Service["${php_package}-fpm"],
 	}
 }

@@ -72,12 +72,12 @@ class v8js::extension(
 	}
 
 	file { [
-		'/etc/php/7.1/fpm/conf.d/99-v8js.ini',
-		'/etc/php/7.1/cli/conf.d/99-v8js.ini'
+		"/etc/php/${php_package}/fpm/conf.d/99-v8js.ini",
+		"/etc/php/${php_package}/cli/conf.d/99-v8js.ini"
 	]:
 		ensure => link,
-		require => File['/etc/php/7.1/mods-available/v8js.ini'],
-		target => '/etc/php/7.1/mods-available/v8js.ini',
+		require => File["/etc/php/${php_package}/mods-available/v8js.ini"],
+		target => "/etc/php/${php_package}/mods-available/v8js.ini",
 		notify => Service["${php_package}-fpm"],
 	}
 }

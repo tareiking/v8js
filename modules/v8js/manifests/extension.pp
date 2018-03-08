@@ -1,3 +1,4 @@
+# A class to setup the v8js extension and dependencies.
 class v8js::extension(
 	$config
 ) {
@@ -7,7 +8,7 @@ class v8js::extension(
 	}
 
 	package { [ "libv8-${v8_version}", "libv8-${v8_version}-dev" ]:
-		ensure => installed,
+		ensure  => installed,
 		require => [ Apt::Ppa["ppa:pinepain/libv8-${v8_version}"] ],
 	}
 
@@ -53,10 +54,10 @@ class v8js::extension(
 	}
 
 	exec { 'pecl install v8js':
-		command => "/bin/echo '/opt/libv8-${v8_version}' | /usr/bin/pecl install v8js",
-		unless  => '/usr/bin/pecl info v8js',
+		command   => "/bin/echo '/opt/libv8-${v8_version}' | /usr/bin/pecl install v8js",
+		unless    => '/usr/bin/pecl info v8js',
 		logoutput => true,
-		require => [
+		require   => [
 			Package["libv8-${v8_version}"],
 			Package["libv8-${v8_version}-dev"],
 			Package['php-pear'],
@@ -66,8 +67,8 @@ class v8js::extension(
 	}
 
 	file { "/etc/php/${version}/mods-available/v8js.ini":
-		ensure => file,
-		content => "extension=v8js.so",
+		ensure  => file,
+		content => 'extension=v8js.so',
 		require => Exec['pecl install v8js'],
 	}
 
@@ -75,9 +76,9 @@ class v8js::extension(
 		"/etc/php/${version}/fpm/conf.d/99-v8js.ini",
 		"/etc/php/${version}/cli/conf.d/99-v8js.ini"
 	]:
-		ensure => link,
+		ensure  => link,
 		require => File["/etc/php/${version}/mods-available/v8js.ini"],
-		target => "/etc/php/${version}/mods-available/v8js.ini",
-		notify => Service["${php_package}-fpm"],
+		target  => "/etc/php/${version}/mods-available/v8js.ini",
+		notify  => Service["${php_package}-fpm"],
 	}
 }

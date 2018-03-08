@@ -1,3 +1,4 @@
+# A class to install v8js on your Chassis server.
 class v8js(
  	$config
 ) {

@@ -1,5 +1,5 @@
 class v8js(
-	$config
+ 	$config
 ) {
 	include apt
 
@@ -7,7 +7,6 @@ class v8js(
 		config  => $config,
 		require => [
 			Class['apt'],
-			# Class['chassis::php'],
 		],
 	}
 }

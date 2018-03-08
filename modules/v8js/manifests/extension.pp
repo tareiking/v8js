@@ -39,14 +39,12 @@ class v8js::extension(
 			ensure  => installed,
 			require => [
 				Apt::Pin["${php_package}-dev"],
-				# Class['chassis::php'],
 			],
 		}
 	}
 
 	package { 'php-pear':
 		ensure => installed,
-		# require => Class['chassis::php'],
 	}
 
 	exec { 'pecl channel-update pecl.php.net':
@@ -56,15 +54,13 @@ class v8js::extension(
 
 	exec { 'pecl install v8js':
 		command => "/bin/echo '/opt/libv8-${v8_version}' | /usr/bin/pecl install v8js",
-		# environment => [
-		# 	'LDFLAGS="-lstdc++"'
-		# ],
 		unless  => '/usr/bin/pecl info v8js',
 		logoutput => true,
 		require => [
 			Package["libv8-${v8_version}"],
 			Package["libv8-${v8_version}-dev"],
 			Package['php-pear'],
+			Package["${php_package}-dev"],
 			Exec['pecl channel-update pecl.php.net'],
 		],
 	}
@@ -76,12 +72,12 @@ class v8js::extension(
 	}
 
 	file { [
-		'/etc/php/7.1/fpm/conf.d/99-v8js.ini',
-		'/etc/php/7.1/cli/conf.d/99-v8js.ini'
+		"/etc/php/${php_package}/fpm/conf.d/99-v8js.ini",
+		"/etc/php/${php_package}/cli/conf.d/99-v8js.ini"
 	]:
 		ensure => link,
-		require => File['/etc/php/7.1/mods-available/v8js.ini'],
-		target => '/etc/php/7.1/mods-available/v8js.ini',
+		require => File["/etc/php/${php_package}/mods-available/v8js.ini"],
+		target => "/etc/php/${php_package}/mods-available/v8js.ini",
 		notify => Service["${php_package}-fpm"],
 	}
 }

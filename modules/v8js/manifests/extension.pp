@@ -77,7 +77,7 @@ class v8js::extension(
 		"/etc/php/${version}/cli/conf.d/99-v8js.ini"
 	]:
 		ensure  => link,
-		require => File["/etc/php/${version}/mods-available/v8js.ini"],
+		require => [ File["/etc/php/${version}/mods-available/v8js.ini"], [ Package["${php_package}-fpm"] ] ],
 		target  => "/etc/php/${version}/mods-available/v8js.ini",
 		notify  => Service["${php_package}-fpm"],
 	}

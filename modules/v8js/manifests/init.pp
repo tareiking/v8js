@@ -1,5 +1,5 @@
 class v8js(
-	$config
+ 	$config
 ) {
 	include apt
 

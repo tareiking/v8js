@@ -9,13 +9,13 @@ class v8js::extension(
 	}
 
 	$v8_version = '6.6'
-	apt::ppa { "ppa:pinepain/libv8-${v8_version}":
-		require => [ Package[ $::apt::ppa_package ] ],
+	apt::ppa { "ppa:pinepain/libv8":
+		require => Class['apt'],
 	}
 
 	package { [ "libv8-${v8_version}", "libv8-${v8_version}-dev" ]:
 		ensure  => $package,
-		require => [ Apt::Ppa["ppa:pinepain/libv8-${v8_version}"] ],
+		require => [ Apt::Ppa["ppa:pinepain/libv8"] ],
 	}
 
 	$version = $config[php]

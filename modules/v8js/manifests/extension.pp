@@ -56,11 +56,10 @@ class v8js::extension(
 
 	if ( installed == $package ) {
 		exec { 'pecl install v8js':
-			command   => "/bin/echo '/opt/libv8-${v8_version}
+			command => "/bin/echo '/opt/libv8-${v8_version}
 				' | /usr/bin/pecl install v8js",
-			unless    => '/usr/bin/pecl info v8js',
-			logoutput => true,
-			require   => [
+			unless  => '/usr/bin/pecl info v8js',
+			require => [
 				Package["libv8-${v8_version}"],
 				Package["libv8-${v8_version}-dev"],
 				Package['php-pear'],

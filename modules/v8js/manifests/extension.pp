@@ -50,8 +50,10 @@ class v8js::extension(
 		}
 	}
 
-	package { 'php-pear':
-		ensure => installed,
+	if ! defined( Package['php-pear'] ) {
+		package { 'php-pear':
+			ensure => installed,
+		}
 	}
 
 	if ( installed == $package ) {

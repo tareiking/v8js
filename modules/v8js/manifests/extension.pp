@@ -56,6 +56,14 @@ class v8js::extension(
 		}
 	}
 
+	if versioncmp( $version, '7.2' ) >= 0 {
+		exec { 'install archive tar':
+		  path    => '/usr/bin',
+		  command => 'pear install Archive_Tar',
+		  require => Package['php-pear']
+		}
+	}
+
 	if ( installed == $package ) {
 		exec { 'pecl install v8js':
 			command => "/bin/echo '/opt/libv8-${v8_version}

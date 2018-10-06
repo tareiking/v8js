@@ -72,7 +72,10 @@ class v8js::extension(
 
 		exec { 'pecl channel-update pecl.php.net':
 			path    => '/usr/bin',
-			require => Package['php-pear'],
+			require =>  [
+				Package['php-pear'],
+				Package["${php_package}-xml"],
+			]
 		}
 
 		file { "/etc/php/${version}/mods-available/v8js.ini":

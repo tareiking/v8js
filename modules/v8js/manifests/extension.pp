@@ -60,6 +60,7 @@ class v8js::extension(
 		exec { 'install archive tar':
 		  path    => '/usr/bin',
 		  command => 'pear install Archive_Tar',
+		  unless  => 'pear info Archive_Tar',
 		  require => Package['php-pear']
 		}
 	}
